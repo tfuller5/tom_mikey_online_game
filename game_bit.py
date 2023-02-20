@@ -7,6 +7,7 @@ class chatbox:
         self.activated = False
         self.message = []
         self.cursor = 0
+        self.bad_keys = {pygame.KMOD_SHIFT, pygame.K_LSHIFT, pygame.K_RSHIFT}
 
     def is_active(self):
         return self.activated
@@ -17,36 +18,31 @@ class chatbox:
     def deactivate(self):
         self.activated = False
 
-    def send_key(self, key):
-        if key == pygame.K_LEFT:
+    def reset(self):
+        self.message = []
+
+    def send_key(self, event):
+        print(self.message)
+        if event.key == pygame.K_RETURN:
+            self.deactivate()
+            self.reset()
+            return "".join(self.message)
+
+        elif event.key == pygame.K_LEFT:
             if self.cursor != 0:
                 self.cursor = self.cursor - 1
             output.speak(self.message[self.cursor])
 
-        if key == pygame.K_RIGHT:
+        elif event.key == pygame.K_RIGHT:
             if self.cursor < len(self.message) - 1:
                 self.cursor = self.cursor + 1
             output.speak(self.message[self.cursor])
 
-        if key == pygame.K_RETURN:
-            self.deactivate()
-            return "".join(self.message)
-
-        elif key == pygame.K_BACKSPACE:
-            if self.message != "":
-                self.message = self.message[:-1]
-        else:
-            print(key)
-            char = "@"
-            if key < 255:
-                if pygame.key.get_pressed()[pygame.K_LSHIFT] or pygame.key.get_pressed()[pygame.K_RSHIFT]:
-                    if 49 <= key <= 57:
-                        char = chr(key - 16)
-                    else:
-                        char = chr(key - 32)
-                else:
-                    char = chr(key)
-            self.message.insert(self.cursor, char)
+        elif event.key == pygame.K_BACKSPACE:
+            if self.message != []:
+                self.message.pop()
+        elif event.key not in self.bad_keys:
+            self.message.insert(self.cursor, event.unicode)
             self.cursor = self.cursor + 1
 
 class whereami:
@@ -122,10 +118,11 @@ def mainloop(client):
 
 
                 if my_chatbox.is_active():
-                    message = my_chatbox.send_key(event.key)
+                    message = my_chatbox.send_key(event)
                     if message is not None:
                         client.Chat(message)
-
+                        #https://github.com/tfuller5/tom_mikey_online_game.git
+#sorry about that, can you put me in the voice thingy window?
                 else:
                     if event.key == pygame.K_SLASH:
                         output.speak("Enter your message")
