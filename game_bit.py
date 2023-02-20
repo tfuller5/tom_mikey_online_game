@@ -6,8 +6,7 @@ class chatbox:
     def __init__(self):
         self.activated = False
         self.message = []
-        self.cursor = 0
-        self.bad_keys = {pygame.KMOD_SHIFT, pygame.K_LSHIFT, pygame.K_RSHIFT}
+        self.cursor = -1
 
     def is_active(self):
         return self.activated
@@ -24,9 +23,10 @@ class chatbox:
     def send_key(self, event):
         print(self.message)
         if event.key == pygame.K_RETURN:
+            final_message = "".join(self.message)
             self.deactivate()
             self.reset()
-            return "".join(self.message)
+            return final_message
 
         elif event.key == pygame.K_LEFT:
             if self.cursor != 0:
@@ -41,7 +41,7 @@ class chatbox:
         elif event.key == pygame.K_BACKSPACE:
             if self.message != []:
                 self.message.pop()
-        elif event.key not in self.bad_keys:
+        elif event.unicode != "":
             self.message.insert(self.cursor, event.unicode)
             self.cursor = self.cursor + 1
 
