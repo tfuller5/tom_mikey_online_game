@@ -1,0 +1,10 @@
+server.py:
+* send chat messages
+* send coordinates when any client moves
+* store and load player data
+
+
+client.py:
+* everything that doesn't need the server
+* tom runs client.py on toms computer, mikey runs client.py on mikey's computer
+* all graphics all game logic (except secuirty things)
