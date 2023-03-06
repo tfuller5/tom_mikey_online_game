@@ -14,7 +14,13 @@ class chatbox:
         self.updated()
 
     def updated(self):
-        pass
+        if self.message != []:
+            if self.cursor == -1:
+                output.speak("blank")
+            else:
+                output.speak(self.message[self.cursor])
+        else:
+            output.speak("blank")
         #self.actual = font.render("What are you thinking right now?: "+"".join(self.message), True, Blue)
         #self.upto = font.render("What are you thinking right now?: "+"".join(self.message[:self.cursor + 1]), True, Blue)
 
