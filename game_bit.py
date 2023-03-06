@@ -1,12 +1,19 @@
 import pygame
 import os
 from output import output
-
 class chatbox:
     def __init__(self):
         self.activated = False
         self.message = []
+        self.actual = ""
+        self.upto = ""
         self.cursor = -1
+        self.updated()
+
+    def updated(self):
+        pass
+        #self.actual = font.render("What are you thinking right now?: "+"".join(self.message), True, Blue)
+        #self.upto = font.render("What are you thinking right now?: "+"".join(self.message[:self.cursor + 1]), True, Blue)
 
     def is_active(self):
         return self.activated
@@ -18,6 +25,7 @@ class chatbox:
         self.activated = False
 
     def reset(self):
+        self.cursor = -1
         self.message = []
 
     def send_key(self, event):
@@ -26,24 +34,30 @@ class chatbox:
             final_message = "".join(self.message)
             self.deactivate()
             self.reset()
+            self.updated()
             return final_message
 
         elif event.key == pygame.K_LEFT:
-            if self.cursor != 0:
+            print("left")
+            print(self.cursor)
+            if self.cursor >= 0:
                 self.cursor = self.cursor - 1
-            output.speak(self.message[self.cursor])
+            self.updated()
 
         elif event.key == pygame.K_RIGHT:
             if self.cursor < len(self.message) - 1:
                 self.cursor = self.cursor + 1
-            output.speak(self.message[self.cursor])
+            self.updated()
 
         elif event.key == pygame.K_BACKSPACE:
-            if self.message != []:
-                self.message.pop()
+            if self.message != [] and self.cursor != -1:
+                self.message.pop(self.cursor)
+                self.cursor -= 1
+                self.updated()
         elif event.unicode != "":
-            self.message.insert(self.cursor, event.unicode)
             self.cursor = self.cursor + 1
+            self.message.insert(self.cursor, event.unicode)
+            self.updated()
 
 class whereami:
     the_map = [
