@@ -1,7 +1,8 @@
 from __future__ import print_function
 from time import sleep
 
-from output import output
+from accessible_output2.outputs.auto import Auto
+output = Auto()
 
 from PodSixNet.Connection import connection, ConnectionListener
 

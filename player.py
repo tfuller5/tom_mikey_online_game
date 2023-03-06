@@ -1,4 +1,5 @@
-from output import output
+from accessible_output2.outputs.auto import Auto
+output = Auto()
 import os
 import json
 from shop import load

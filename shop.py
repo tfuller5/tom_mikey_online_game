@@ -1,4 +1,5 @@
-from output import output
+from accessible_output2.outputs.auto import Auto
+output = Auto()
 import simple_menu
 import lucia
 if not lucia.running: lucia.initialize()

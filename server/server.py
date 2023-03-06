@@ -6,7 +6,8 @@ from weakref import WeakKeyDictionary
 
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
-from output import output
+from accessible_output2.outputs.auto import Auto
+output = Auto()
 
 class PlayerChannel(Channel):
     nickname: str
@@ -69,7 +70,7 @@ class ChatServer(Server):
             self.Pump()
             sleep(0.0001)
 
-host = "192.168.0.103"
+host = "0.0.0.0"
 port = 80
 s = ChatServer(localaddr=(host, int(port)))
 s.Launch()

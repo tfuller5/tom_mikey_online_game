@@ -1,6 +1,9 @@
 import pygame
 import os
-from output import output
+from accessible_output2.outputs.auto import Auto
+output = Auto()
+
+
 class chatbox:
     def __init__(self):
         self.activated = False
