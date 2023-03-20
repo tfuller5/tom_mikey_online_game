@@ -16,6 +16,10 @@ class Client(ConnectionListener):
         output.speak("Enter your nickname: ")
         connection.Send({"action": "give_nickname", "name": input("> ")})
         t = start_new_thread(lambda *args: mainloop(self), ())
+        self.Loop()
+
+    def Network_welcome(self):
+        output.speak("Server says welcome!")
 
     def ListEveryone(self):
         connection.Send({"action": "ListEveryone"})
@@ -39,6 +43,9 @@ class Client(ConnectionListener):
     def Network_chat(self, data):
         output.speak(data["name"] + " said " + data["message"])
 
+    def Network_confirmation(self, data):
+        print(f"MY MESSAGE WAS RECIEVED <{data['response']}>")
+
     def Loop(self):
         connection.Pump()
         self.Pump()
@@ -50,7 +57,8 @@ class Client(ConnectionListener):
         output.speak(data["name"] + " has connected to the server")
 
 
-host = "81.106.228.102"
+host = "81.106.228.103"
+host = "localhost"
 port = 80
 c = Client(host, int(port))
 while True:
