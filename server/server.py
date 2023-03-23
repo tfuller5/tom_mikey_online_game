@@ -19,6 +19,7 @@ class PlayerChannel(Channel):
         Channel.__init__(self, *args, **kwargs)
 
     def confirm(self, message):
+        print(f"sending confirmation to {self.nickname} of {message}")
         self.Send({"action": "confirmation", "response": message})
 
     def Close(self):
@@ -35,17 +36,17 @@ class PlayerChannel(Channel):
         self.SendToEveryoneElse({"action": "someone_just_moved", "x": data["x"], "y": data["y"]})
 
     def Network_give_nickname(self, data):
-        print("nice!")
         self.nickname = data["name"]
         self.SendToEveryoneElse({"action": "new_guy", "name": self.nickname})
+        self.confirm(f"your joined, your name is {self.nickname}, {len(self._server.players) - 1} players were informed")
 
     def Network_ListEveryone(self, data):
         names = [p.nickname for p in self._server.players]
         self.Send({"action": "ListEveryone", "names": names})
 
     def Network_chat(self, data):
-        self.confirm("your chat was sent to everyone")
         self.SendToEveryoneElse({"action": "chat", "name": self.nickname, "message": data["message"]})
+        self.confirm("your chat was sent to everyone")
 
 
 class ChatServer(Server):
@@ -57,14 +58,9 @@ class ChatServer(Server):
         print('SERVER LAUNCHED')
     
     def Connected(self, channel, addr):
-        channel.confirm("you have connected, just waiting for a nickname now")
         print("get connected for free", addr)
+        channel.confirm(f"connected, nice job. {len(self.players)} other players in lobby")
         self.players.append(channel)
-        channel.send({"action": "welcome"})
-        self.SendToAll({"action": "ListEveryone", "names": [p.nickname for p in self.players]})
-        # player nickname will be shown immediately after
-
-
 
     def DelPlayer(self, player):
         self.players.remove(player)
@@ -79,7 +75,7 @@ class ChatServer(Server):
 
 host = "0.0.0.0"
 #host = "localhost"
-port = 80
+port = 8080
 s = ChatServer(localaddr=(host, int(port)))
 s.Launch()
 
