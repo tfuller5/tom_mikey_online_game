@@ -19,7 +19,7 @@ class PlayerChannel(Channel):
         Channel.__init__(self, *args, **kwargs)
 
     def confirm(self, message):
-        print(f"sending confirmation to {self.nickname} of {message}")
+        print(f"sending confirmation to {self.nickname} === {message}")
         self.Send({"action": "confirmation", "response": message})
 
     def Close(self):
@@ -45,6 +45,7 @@ class PlayerChannel(Channel):
         self.Send({"action": "ListEveryone", "names": names})
 
     def Network_chat(self, data):
+        print(f"\"{data['message']}\"")
         self.SendToEveryoneElse({"action": "chat", "name": self.nickname, "message": data["message"]})
         self.confirm("your chat was sent to everyone")
 
@@ -63,6 +64,8 @@ class ChatServer(Server):
         self.players.append(channel)
 
     def DelPlayer(self, player):
+        print(f"bye bye {player.nickname}")
+        player.SendToEveryoneElse({"action": "someone_else_disconnected", "name": player.nickname})
         self.players.remove(player)
     
     def SendToAll(self, data):

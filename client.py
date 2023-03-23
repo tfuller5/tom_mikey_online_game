@@ -48,6 +48,9 @@ class Client(ConnectionListener):
     def Network_new_guy(self, data):
         output.speak(data["name"] + " has connected to the server")
 
+    def Network_someone_else_disconnected(self, data):
+        output.speak(str(data["name"]) + " has disconnected from the server")
+
     def Loop(self):
         connection.Pump()
         self.Pump()
