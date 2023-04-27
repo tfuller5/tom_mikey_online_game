@@ -25,12 +25,18 @@ class PlayerChannel(Channel):
     def Close(self):
         self._server.DelPlayer(self)
 
+
     ##################################
     ##################################
     def SendToEveryoneElse(self, data):
         for player in self._server.players:
             if player != self:
                 player.Send(data)
+
+    def Network_save_player_data(self, encrypted_data):
+        file = open(f"{self.nickname}_data.txt", "w")
+        file.write(encrypted_data["data"])
+        file.close()
 
     def Network_i_just_moved(self, data):
         self.SendToEveryoneElse({"action": "someone_just_moved", "x": data["x"], "y": data["y"]})
@@ -52,6 +58,7 @@ class PlayerChannel(Channel):
 
 class ChatServer(Server):
     channelClass = PlayerChannel
+    key = "SWJiETZZVKXbhNQwv9LSJR26jONtOEl40NhnTGcL6t8="
     
     def __init__(self, *args, **kwargs):
         Server.__init__(self, *args, **kwargs)

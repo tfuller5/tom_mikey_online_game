@@ -25,6 +25,46 @@ class whereami:
     sound_map = {1: "grass", 2: "concrete", 3: "cement"}
     x = 0
     y = 0
+    z = 0
+    rising_now = False
+    falling_now = False
+
+    @staticmethod
+    def jump_start():
+        whereami.rising_now = True
+        print("jump start")
+
+    @staticmethod
+    def jump_end():
+        whereami.falling_now = False
+        output.speak("floor")
+
+    @staticmethod
+    def hit_roof():
+        output.speak("ceiling")
+        whereami.falling_now = True
+        whereami.rising_now = False
+
+    @staticmethod
+    def rising():
+        print(whereami.z)
+        whereami.z += 0.1
+        if round(whereami.z, 2) == 5:
+            whereami.hit_roof()
+
+    @staticmethod
+    def falling():
+        print(whereami.z)
+        whereami.z -= 0.1
+        if round(whereami.z, 2) == 0:
+            whereami.jump_end()
+
+    @staticmethod
+    def frame_jump_fall():
+        if whereami.rising_now:
+            whereami.rising()
+        if whereami.falling_now:
+            whereami.falling()
 
     @staticmethod
     def get_tile_type():
@@ -40,15 +80,19 @@ class whereami:
 
 
 def youmove(x, y):
-    output.speak(f"you are is at {whereami.x} {whereami.y}")
-    output.speak(f"other guy is at {x} {y}")
-    if os.path.exists("pop.mp3"):
-        pop = pygame.mixer.Sound("pop.mp3")
+    #output.speak(f"{x} {y}")
 
+    distance = ((whereami.x - x) ** 2 + (whereami.y - y) ** 2) ** 0.5
+    print(distance)
+    if os.path.exists("pop.mp3"):#
+        print(f"pop {(1- distance / 15)}")
+        pop = pygame.mixer.Sound("pop.mp3")
+        pop.set_volume(1- distance / 15)
         pop.play()
     else:
+        print(f"step {1 - distance / 15}")
         step = pygame.mixer.Sound("step.wav")
-        step.set_volume(1)
+        step.set_volume(1 -distance / 15)
         step.play()
 
 def imove(client):
@@ -69,6 +113,7 @@ def noise():
     output.speak(whereami.sound_map[tile_type])
     output.speak(str(whereami.x))
     output.speak(str(whereami.y))
+    output.speak(str(round(whereami.z, 1)))
     player.save()
 
 
@@ -88,6 +133,7 @@ def build():
 
     whereami.set_tile_type(int(s.get_item_name(choice)), minx, maxx, miny, maxy)
 
+
 def mainloop(client):
     # horrid threaded input loop
     #valid_keys = "abcdefghijklmnopqrstuvwxyz !"£$%^&*()_-+=#\
@@ -96,13 +142,14 @@ def mainloop(client):
     frames_per_second= 60
     frame_number =0
     my_chatbox = chatbox()
-    screen = pygame.display.set_mode([50, 50])
+    pygame.display.set_mode([50, 50])
     clock = pygame.time.Clock()
     pygame.init()
     pygame.mixer.init()
 
     while True:
         frame_number += 1
+        whereami.frame_jump_fall()
 
         #if pygame.key.get_mods() & pygame.KMOD_CTRL:
         #    player.equipped.triggerhold(frame_number)
@@ -118,39 +165,35 @@ def mainloop(client):
 
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: player.save(); return
-
+                if event.key == pygame.K_ESCAPE:
+                    encrypted_data = player.get_save_data()
+                    client.Save(encrypted_data)
+                    return
 
                 if my_chatbox.is_active():
                     message = my_chatbox.send_key(event)
-                    print(message)
-                    if message is not None:
-                        client.Chat(message)
-                        #https://github.com/tfuller5/tom_mikey_online_game.git
-                        #sorry about that, can you put me in the voice thingy window?
+                    print("::: "+str(message))
+                    if message is not None: client.Chat(message)
                 else:
-                    if event.key == pygame.K_SLASH:
-                        output.speak("Enter your message")
-                        my_chatbox.activate()
-                    if event.key == pygame.K_i:
-                        client.ListEveryone()
+                    if pygame.key.get_mods() & pygame.KMOD_SHIFT: # shift key as well
+                        if event.key == pygame.K_LEFT: player.turn("left")
+                        if event.key == pygame.K_RIGHT: player.turn("right")
+                        if event.key == pygame.K_UP: player.turn("up")
+                        if event.key == pygame.K_DOWN: player.turn("down")
+                        if event.key == pygame.K_l: info()
 
-                if event.key == pygame.K_c: noise()
+                    if event.key == pygame.K_SLASH: my_chatbox.activate(); output.speak("Enter a message")
+                    elif event.key == pygame.K_o: client.ListEveryone()
+                    elif event.key == pygame.K_c: noise()
+                    elif event.key == pygame.K_l: output.speak(f"You are level {player.level}")
+                    elif event.key == pygame.K_h: output.speak(f"You have {player.health} health.")
+                    elif event.key == pygame.K_p: output.speak(f"You have {player.points} points.")
+                    elif event.key == pygame.K_s: shop(player)
+                    elif event.key == pygame.K_i: inventory(player.items)
+                    elif event.key == pygame.K_g: output.speak(f"You have {player.gold} gold.")
+                    elif event.key == pygame.K_b: build()
+                    elif event.key == pygame.K_1: weapons.select_weapon(player)
+                    elif event.key == pygame.K_SPACE: whereami.jump_start()
 
-                if pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                    if event.key == pygame.K_LEFT: player.turn("left")
-                    if event.key == pygame.K_RIGHT: player.turn("right")
-                    if event.key == pygame.K_UP: player.turn("up")
-                    if event.key == pygame.K_DOWN: player.turn("down")
-
-                if event.key == pygame.K_l: output.speak(f"You are level {player.level}")
-                if event.key == pygame.K_h: output.speak(f"You have {player.health} health.")
-                if event.key == pygame.K_l and pygame.key.get_mods() & pygame.KMOD_SHIFT: info()
-                if event.key == pygame.K_p: output.speak(f"You have {player.points} points.")
-                if event.key == pygame.K_s: shop(player)
-                if event.key == pygame.K_i: inventory(player.items)
-                if event.key == pygame.K_g: output.speak(f"You have {player.gold} gold.")
-                if event.key == pygame.K_b: build()
-                if event.key == pygame.K_1: weapons.select_weapon(player)
 
         clock.tick(frames_per_second)

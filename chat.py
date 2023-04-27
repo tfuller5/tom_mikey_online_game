@@ -20,6 +20,7 @@ class chatbox:
         return self.activated
 
     def activate(self):
+        output.speak("Enter your message")
         self.activated = True
 
     def deactivate(self):

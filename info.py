@@ -1,5 +1,5 @@
 from player import player
-from gamething import simple_menu
+import simple_menu
 import lucia
 
 if not lucia.running: lucia.initialize()

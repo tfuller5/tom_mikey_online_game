@@ -8,9 +8,10 @@ from encryption import new_key, encrypt, decrypt
 
 class player:
     equipped = None
+    key = "SWJiETZZVKXbhNQwv9LSJR26jONtOEl40NhnTGcL6t8="
     x = 0
     y = 0
-    gold = 100000000000000000000000
+    gold = 50
     level = 1
     health = 100
     points = 0
@@ -41,7 +42,8 @@ class player:
         output.speak("world " + player.world)
 
     @staticmethod
-    def save():
+    def get_save_data():
+
         if not os.path.exists("key.txt"):
             new_key("key.txt")
         file = open(player.filename, "wb")
@@ -54,6 +56,7 @@ class player:
         )
         file.close()
         encrypt(player.filename, "key.txt")
+        return "testing"
 
     @staticmethod
     def load():

@@ -13,10 +13,17 @@ from game_bit import mainloop, youmove
 class Client(ConnectionListener):
     def __init__(self, host, port):
         self.Connect((host, port))
-        output.speak("Enter your nickname: ")
-        connection.Send({"action": "give_nickname", "name": input("> ")})
+        name= "%"
+        while not name.isalnum():
+            output.speak("Enter your nickname: ")
+            name = input("> ")
+        name = name.replace(" ", "_")
+        connection.Send({"action": "give_nickname", "name": name})
         t = start_new_thread(lambda *args: mainloop(self), ())
         self.Loop()
+
+    def Save(self, encrypted_data):
+        connection.Send({"action": "save_player_data", "data": encrypted_data})
 
     def ListEveryone(self):
         connection.Send({"action": "ListEveryone"})
@@ -57,7 +64,8 @@ class Client(ConnectionListener):
 
 
 host = "81.106.228.102"
-host = "3.219.237.220"
+host = "44.200.50.168"
+host = "34.205.4.43"
 port = 8080
 c = Client(host, int(port))
 while True:
