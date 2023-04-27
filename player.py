@@ -17,7 +17,7 @@ class player:
     points = 0
     items = {}
     world = "default"
-    filename = "player_data.txt"
+    filename = "game_files/player_data.txt"
 
     @staticmethod
     def turn(facing):
@@ -44,8 +44,8 @@ class player:
     @staticmethod
     def get_save_data():
 
-        if not os.path.exists("key.txt"):
-            new_key("key.txt")
+        if not os.path.exists("game_files/key.txt"):
+            new_key("game_files/key.txt")
         file = open(player.filename, "wb")
         ids = [(k, player.items[k][1]) for k in player.items.keys()]
         print(ids)
@@ -55,7 +55,7 @@ class player:
 
         )
         file.close()
-        encrypt(player.filename, "key.txt")
+        encrypt(player.filename, "game_files/key.txt")
         return "testing"
 
     @staticmethod
@@ -63,7 +63,7 @@ class player:
         if not os.path.exists(player.filename):
             return
 
-        decrypt(player.filename, "key.txt")
+        decrypt(player.filename, "game_files/key.txt")
         file = open(player.filename, "rb")
         data = json.loads(file.read().decode("utf-8"))
         file.close()
@@ -77,6 +77,6 @@ class player:
         player.health = data["health"]
         player.points = data["points"]
         player.world = data["world"]
-        encrypt(player.filename, "key.txt") # make sure it stays encrypted
+        encrypt(player.filename, "game_files/key.txt") # make sure it stays encrypted
 
 

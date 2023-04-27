@@ -84,24 +84,24 @@ def youmove(x, y):
 
     distance = ((whereami.x - x) ** 2 + (whereami.y - y) ** 2) ** 0.5
     print(distance)
-    if os.path.exists("pop.mp3"):#
+    if os.path.exists("game_files/pop.mp3"):#
         print(f"pop {(1- distance / 15)}")
-        pop = pygame.mixer.Sound("pop.mp3")
+        pop = pygame.mixer.Sound("game_files/pop.mp3")
         pop.set_volume(1- distance / 15)
         pop.play()
     else:
         print(f"step {1 - distance / 15}")
-        step = pygame.mixer.Sound("step.wav")
+        step = pygame.mixer.Sound("game_files/step.wav")
         step.set_volume(1 -distance / 15)
         step.play()
 
 def imove(client):
-    if os.path.exists("pop.mp3"):
-        pop = pygame.mixer.Sound("pop.mp3")
+    if os.path.exists("game_files/pop.mp3"):
+        pop = pygame.mixer.Sound("game_files/pop.mp3")
 
         pop.play()
     else:
-        step = pygame.mixer.Sound("step.wav")
+        step = pygame.mixer.Sound("game_files/step.wav")
         step.set_volume(1)
         step.play()
 
@@ -142,7 +142,7 @@ def mainloop(client):
     frames_per_second= 60
     frame_number =0
     my_chatbox = chatbox()
-    pygame.display.set_mode([50, 50])
+
     clock = pygame.time.Clock()
     pygame.init()
     pygame.mixer.init()
