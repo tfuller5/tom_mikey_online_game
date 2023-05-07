@@ -1,4 +1,8 @@
-from __future__ import print_function
+#No worries, see you soonMy mum said were free so I think were good. Great, appologies, thank you, see you saturday! What time on saturday? how about 5pm? Sorry about this
+#Uh oh, what should we do? lesson on saturday? could you do the leson on saturday instead? Very sorry about this
+#
+#
+# from __future__ import print_function
 from time import sleep
 
 from accessible_output2.outputs.auto import Auto
@@ -7,7 +11,7 @@ output = Auto()
 from PodSixNet.Connection import connection, ConnectionListener
 
 from _thread import *
-from game_bit import mainloop, youmove
+from game_bit import mainloop, youmove, game
 import pygame
 import simple_menu
 from chat import chatbox
@@ -16,13 +20,28 @@ from chat import chatbox
 class Client(ConnectionListener):
     def __init__(self):
         self.name = load_nickname()
+        self.connected = False
+        self.connect_callback = None
 
-    def connect(self, host, port):
-        self.Connect((host, port))
+        host = "81.106.228.102"
+        host = "44.200.50.168"
+        host = "34.205.4.43"
+        host = "34.237.139.36"
+        host = "localhost"
+        port = 8080
+
+        self.host = host
+        self.port = port
+
+    def start_game(self):
+        mainloop(self)
+
+    def connect(self, callback):
+        self.Connect((self.host, self.port))
+        print("hello?")
 
         connection.Send({"action": "give_nickname", "name": self.name})
-        t = start_new_thread(lambda *args: mainloop(self), ())
-        self.Loop()
+        self.connect_callback = callback
 
     def Save(self, encrypted_data):
         connection.Send({"action": "save_player_data", "data": encrypted_data})
@@ -46,6 +65,10 @@ class Client(ConnectionListener):
         output.speak("You said: "+ message)
         connection.Send({"action": "chat", "message": message})
 
+    def Network_I_connected(self, data):
+        print("I connected, confirmation")
+        self.connected = True
+        self.connect_callback()
 
     def Network_chat(self, data):
         output.speak(data["name"] + " said " + data["message"])
@@ -65,12 +88,6 @@ class Client(ConnectionListener):
         self.Pump()
 
 
-host = "81.106.228.102"
-host = "44.200.50.168"
-host = "34.205.4.43"
-port = 8080
-
-
 def load_nickname():
     nickname_file = "game_files/nick_is_the_name.txt"
 
@@ -83,48 +100,11 @@ def load_nickname():
         open(nickname_file, "w").close()
         return None
 
-def get_nickname():
-    nickname_box = chatbox()
-    nickname_box.activate()
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.KEYDOWN:
-                name = nickname_box.send_key(event)
-                if name:
-                    if name.isalnum():
-                        name = name.replace(" ", "_")
-                        file = open("game_files/nick_is_the_name.txt", "w")
-                        file.write(name)
-                        file.close()
-                        return name
-                    else:
-                        output.speak("bad name")
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-
-def menu(client):
-    s = simple_menu.simple_menu(clicksound="menuclick.ogg", edgesound="menuedge.ogg", entersound="menuenter.ogg",wrapsound="menuwrap.ogg", leftright=False, updown=True, wrapping=True, homeend=True)
-
-    s.add_item("Join as new player", "new")
-    if client.name:
-        s.add_item(f"Join as {client.name}", "old")
-
-    choice = s.run(f"Welcome to a game, this is a game", True)
-
-    print(choice)
-    if s.get_item_name(choice) == "new":
-        client.name = get_nickname()
 
 
-pygame.init()
-pygame.display.set_mode([50, 50])
+
+
 c = Client()
 
-menu(c)
+c.start_game()
 
-c.connect(host, port)
-
-while True:
-    c.Loop()
-    sleep(0.001)

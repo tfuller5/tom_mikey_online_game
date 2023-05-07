@@ -3,7 +3,8 @@ from accessible_output2.outputs.auto import Auto
 output = Auto()
 
 class chatbox:
-    def __init__(self):
+    def __init__(self, prompt = "Enter your message"):
+        self.prompt = prompt
         self.activated = False
         self.message = []
         self.actual = ""
@@ -20,7 +21,7 @@ class chatbox:
         return self.activated
 
     def activate(self):
-        output.speak("Enter your message")
+        output.speak(self.prompt)
         self.activated = True
 
     def deactivate(self):

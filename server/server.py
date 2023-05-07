@@ -22,6 +22,10 @@ class PlayerChannel(Channel):
         print(f"sending confirmation to {self.nickname} === {message}")
         self.Send({"action": "confirmation", "response": message})
 
+    def get_connected_for_free(self):
+        print("confirming connection")
+        self.Send({"action": "I_connected", "nothing": "nothing"})
+
     def Close(self):
         self._server.DelPlayer(self)
 
@@ -67,7 +71,9 @@ class ChatServer(Server):
     
     def Connected(self, channel, addr):
         print("get connected for free", addr)
+        sleep(3)
         channel.confirm(f"connected, nice job. {len(self.players)} other players in lobby")
+        channel.get_connected_for_free()
         self.players.append(channel)
 
     def DelPlayer(self, player):
@@ -84,7 +90,7 @@ class ChatServer(Server):
             sleep(0.0001)
 
 host = "0.0.0.0"
-#host = "localhost"
+host = "localhost"
 port = 8080
 s = ChatServer(localaddr=(host, int(port)))
 s.Launch()
