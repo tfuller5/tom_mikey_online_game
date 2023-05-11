@@ -10,26 +10,31 @@ def load_key(key_file):
     file = open(key_file, "rb")
     return file.read()
 
-def encrypt(filename, key_file):
+def encrypt_message(message, key_file):
     key = load_key(key_file)
     f = Fernet(key)
+    return f.encrypt(message)
+
+def encrypt(filename, key_file):
     file = open(filename, "rb")
     message = file.read()
     file.close()
-    encrypted = f.encrypt(message)
+    encrypted = encrypt_message(message, key_file)
     file = open(filename, "wb")
     file.write(encrypted)
     file.close()
     #messagebox.showinfo("this is a window", "this is a message, your file was encrypted")
 
-
-def decrypt(filename, key_file):
+def decrypt_message(message, key_file):
     key = load_key(key_file)
     f = Fernet(key)
+    return f.decrypt(message)
+
+def decrypt(filename, key_file):
     file = open(filename, "rb")
     message = file.read()
     file.close()
-    decrypted = f.decrypt(message)
+    decrypted = decrypt_message(message, key_file)
     file = open(filename, "wb")
     file.write(decrypted)
     file.close()

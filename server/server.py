@@ -90,7 +90,7 @@ class ChatServer(Server):
             sleep(0.0001)
 
 host = "0.0.0.0"
-host = "localhost"
+#host = "localhost"
 port = 8080
 s = ChatServer(localaddr=(host, int(port)))
 s.Launch()

@@ -1,21 +1,9 @@
-#No worries, see you soonMy mum said were free so I think were good. Great, appologies, thank you, see you saturday! What time on saturday? how about 5pm? Sorry about this
-#Uh oh, what should we do? lesson on saturday? could you do the leson on saturday instead? Very sorry about this
-#
-#
-# from __future__ import print_function
-from time import sleep
-
 from accessible_output2.outputs.auto import Auto
 output = Auto()
 
 from PodSixNet.Connection import connection, ConnectionListener
 
-from _thread import *
-from game_bit import mainloop, youmove, game
-import pygame
-import simple_menu
-from chat import chatbox
-
+from game_bit import mainloop, youmove, youchat
 
 class Client(ConnectionListener):
     def __init__(self):
@@ -27,7 +15,8 @@ class Client(ConnectionListener):
         host = "44.200.50.168"
         host = "34.205.4.43"
         host = "34.237.139.36"
-        host = "localhost"
+        host = "44.193.199.42"
+        #host = "localhost"
         port = 8080
 
         self.host = host
@@ -35,6 +24,11 @@ class Client(ConnectionListener):
 
     def start_game(self):
         mainloop(self)
+
+    def disconnect(self):
+        # this is not working currently
+        self.connected = False
+        connection.Close()
 
     def connect(self, callback):
         self.Connect((self.host, self.port))
@@ -71,7 +65,9 @@ class Client(ConnectionListener):
         self.connect_callback()
 
     def Network_chat(self, data):
-        output.speak(data["name"] + " said " + data["message"])
+        say_this= data["name"] + " said " + data["message"]
+        output.speak(say_this)
+        youchat(say_this)
 
     def Network_confirmation(self, data):
         output.speak(f"CONFIRMATION. <{data['response']}>")
@@ -99,10 +95,6 @@ def load_nickname():
     except FileNotFoundError:
         open(nickname_file, "w").close()
         return None
-
-
-
-
 
 c = Client()
 

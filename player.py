@@ -3,7 +3,7 @@ output = Auto()
 import os
 import json
 from shop import load
-from encryption import new_key, encrypt, decrypt
+from encryption import new_key, encrypt_message, decrypt_message
 
 
 class player:
@@ -42,21 +42,25 @@ class player:
         output.speak("world " + player.world)
 
     @staticmethod
-    def get_save_data():
+    def save(client):
 
         if not os.path.exists("game_files/key.txt"):
             new_key("game_files/key.txt")
         file = open(player.filename, "wb")
         ids = [(k, player.items[k][1]) for k in player.items.keys()]
         print(ids)
-        file.write(
-            bytes(json.dumps({"x": player.x, "y": player.y, "points":player.points, "level": player.level, "gold": player.gold, "world": player.world, "health": player.health, "items": ids}
-                             ), encoding = "utf-8")
+        json_data = json.dumps({
+            "x": player.x,
+             "y": player.y,
+             "points":player.points,
+             "level": player.level,
+             "gold": player.gold,
+             "world": player.world,
+             "health": player.health,
+             "items": ids})
 
-        )
-        file.close()
-        encrypt(player.filename, "game_files/key.txt")
-        return "testing"
+        encrypted_json = encrypt_message(json_data, "game_files/key.txt")
+        client.Save(encrypted_json)
 
     @staticmethod
     def load():

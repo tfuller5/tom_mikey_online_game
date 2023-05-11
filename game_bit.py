@@ -8,6 +8,7 @@ from shop import shop, inventory
 from info import info
 import simple_menu
 from chat import chatbox
+from buffers import buffer_manager
 
 class whereami:
     the_map = [
@@ -108,13 +109,13 @@ def imove(client):
     client.i_just_moved(whereami.x, whereami.y)
 
 
-def noise():
+def noise(client):
     tile_type = whereami.get_tile_type()
     output.speak(whereami.sound_map[tile_type])
     output.speak(str(whereami.x))
     output.speak(str(whereami.y))
     output.speak(str(round(whereami.z, 1)))
-    player.save()
+    player.save(client)
 
 
 def build():
@@ -141,15 +142,41 @@ class game:
 
     STAGE = NICKNAME
 
+    BM = buffer_manager()
+
+
+def youchat(message):
+    game.BM.add_message(message)
+
+
+def quit_menu():
+    s = simple_menu.simple_menu(clicksound="menuclick.ogg", edgesound="menuedge.ogg", entersound="menuenter.ogg",wrapsound="menuwrap.ogg", leftright=False, updown=True, wrapping=True, homeend=True)
+
+    s.add_item("yes", "yes")
+    s.add_item("no", "no")
+
+    choice = s.run("sure you want quit?",True)
+    if s.get_item_name(choice) == "yes":
+        return True
+    else:
+        return False
 
 def handle_game_events(event, client, player, my_chatbox):
     print("game events")
+    game.BM.key_down_event(event)
 
     if my_chatbox.is_active():
         message = my_chatbox.send_key(event)
         print("::: " + str(message))
-        if message is not None: client.Chat(message)
+        if message is not None:
+            game.BM.add_message(client.name + " said "+message)
+            client.Chat(message)
     else:
+        if event.key == pygame.K_ESCAPE:
+            gone = quit_menu()
+            if gone:
+                client.disconnect()
+                menu(client.name)
         if pygame.key.get_mods() & pygame.KMOD_SHIFT:  # shift key as well
             if event.key == pygame.K_LEFT: player.turn("left")
             if event.key == pygame.K_RIGHT: player.turn("right")
@@ -163,7 +190,7 @@ def handle_game_events(event, client, player, my_chatbox):
         elif event.key == pygame.K_o:
             client.ListEveryone()
         elif event.key == pygame.K_c:
-            noise()
+            noise(client)
         elif event.key == pygame.K_l:
             output.speak(f"You are level {player.level}")
         elif event.key == pygame.K_h:
@@ -213,12 +240,14 @@ def menu(current_name):
 def connect(client):
     game.STAGE = game.CONNECTING
 
-    #pygame.mixer.init()
-
-    #pygame.mixer.music.play()
+    pygame.mixer.init()
+    pygame.mixer.music.load("game_files/connecting.mp3")
+    pygame.mixer.music.play()
 
     def callback():
         pygame.mixer.music.stop()
+        pygame.init()
+        pygame.display.set_mode([50, 50])
         game.STAGE = game.GAME
 
     client.connect(callback)
@@ -232,10 +261,10 @@ def mainloop(client):
     frames_per_second= 60
     frame_number =0
 
+    BM = buffer_manager()
     menu(client.name) # this has a loop in it
 
     my_chatbox = chatbox()
-    pygame.mixer.music.load("game_files/connecting.mp3")
     #pygame.mixer.music.play()
 
     print(game.STAGE)
@@ -243,10 +272,8 @@ def mainloop(client):
     if game.STAGE == game.NICKNAME:
         nickname_box = chatbox("Enter your nickname:")
         nickname_box.activate()
-
     else:
         connect(client)
-
 
 
     while True:
@@ -272,8 +299,7 @@ def mainloop(client):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    encrypted_data = player.get_save_data()
-                    client.Save(encrypted_data)
+                    player.save(client)
                     return
 
                 if game.STAGE == game.GAME:
@@ -283,7 +309,6 @@ def mainloop(client):
 
                     if nick_name is not None:
                         client.name = nick_name
-                        pygame.mixer.music.play()
                         connect(client)
 
 
