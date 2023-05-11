@@ -1,0 +1,31 @@
+client.py (run this)
+* client.py handles all communication with the server
+* if you see connection.Send({"action": "function"..., that means there is a function on the server as shown below
+def Network_function(self, data):
+* pygame is not used in client.py
+
+server.py
+* stores player data (is encrypted by the client, before sending to the server)
+* only interracts with client.py, using the same connection.Send mechanism
+
+game_bit.py
+* run by client.py, runs the mainloop() function in game_bit
+* game_bit handles the game logic, and calls upon other files (listed below)
+
+player.py
+* stores player data, encrypts data using encrpyt.py
+* strangely, the class whereami handles the position on the map, this code would be better in the player function
+* staticmethods, one client has one player
+
+encrypt.py
+* just encryption and decryption functinos, nothing to do with player or pygame or server stuff
+
+info.py
+* small file for when they press i
+
+shop.py
+* another small file just for the inventory and buying stuff
+* interracts with weaqpon class
+
+weapons.py
+* has the weapons code.

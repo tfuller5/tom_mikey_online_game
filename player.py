@@ -46,7 +46,7 @@ class player:
 
         if not os.path.exists("game_files/key.txt"):
             new_key("game_files/key.txt")
-        file = open(player.filename, "wb")
+        #file = open(player.filename, "wb")
         ids = [(k, player.items[k][1]) for k in player.items.keys()]
         print(ids)
         json_data = json.dumps({
@@ -57,7 +57,7 @@ class player:
              "gold": player.gold,
              "world": player.world,
              "health": player.health,
-             "items": ids})
+             "items": ids}).encode("utf-8")
 
         encrypted_json = encrypt_message(json_data, "game_files/key.txt")
         client.Save(encrypted_json)

@@ -167,10 +167,16 @@ def handle_game_events(event, client, player, my_chatbox):
 
     if my_chatbox.is_active():
         message = my_chatbox.send_key(event)
-        print("::: " + str(message))
+
         if message is not None:
-            game.BM.add_message(client.name + " said "+message)
-            client.Chat(message)
+            if message.startswith("/giveall"):
+                item = message.split(" ")[1]
+                amount = message.split(" ")[2]
+                output.speak(f"giving all players {amount}" + item)
+            else:
+                print("::: " + str(message))
+                game.BM.add_message(client.name + " said "+message)
+                client.Chat(message)
     else:
         if event.key == pygame.K_ESCAPE:
             gone = quit_menu()

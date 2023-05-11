@@ -12,6 +12,9 @@ class chatbox:
         self.cursor = -1
         self.updated()
 
+    def get_message_str(self):
+        return "".join(self.message)
+
     def updated(self):
         if self.message != []:
             if self.cursor != -1:
@@ -32,7 +35,7 @@ class chatbox:
         self.message = []
 
     def send_key(self, event):
-        print(self.message)
+
         if event.key == pygame.K_RETURN:
             final_message = "".join(self.message)
             self.deactivate()
@@ -55,10 +58,11 @@ class chatbox:
 
         elif event.key == pygame.K_BACKSPACE:
             if self.message != [] and self.cursor != -1:
+                self.updated()
                 self.message.pop(self.cursor)
                 self.cursor -= 1
-                self.updated()
         elif event.unicode != "":
             self.cursor = self.cursor + 1
             self.message.insert(self.cursor, event.unicode)
             self.updated()
+        print(self.message)

@@ -2,7 +2,7 @@ from __future__ import print_function
 
 import sys
 from time import sleep, localtime
-from weakref import WeakKeyDictionary
+import os
 
 from PodSixNet.Server import Server
 from PodSixNet.Channel import Channel
@@ -23,6 +23,8 @@ class PlayerChannel(Channel):
         self.Send({"action": "confirmation", "response": message})
 
     def get_connected_for_free(self):
+        all_files = os.system("ls")
+        print(all_files)
         print("confirming connection")
         self.Send({"action": "I_connected", "nothing": "nothing"})
 
